@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <mysql.h>
 
 struct student {
     int std_id;
@@ -11,11 +12,18 @@ struct student {
     int grades;
     float cgpa;
     char email[100];
-    int phonenum;
+    long long phonenum; 
     char address[100];
 };
 
-void addrecord() {
+
+#define HOST "localhost"
+#define USER "root"      
+#define PASSWORD "root" 
+#define DATABASE "StudentDB"
+
+
+void addrecord(MYSQL *conn) {
     struct student student;
     
     printf("Enter student ID: ");
@@ -59,7 +67,7 @@ void addrecord() {
         getchar();
 
         printf("Phone number: ");
-        scanf("%d", &student.phonenum);
+        scanf("%lld", &student.phonenum); 
         getchar();
         
         printf("Address: ");
@@ -68,21 +76,50 @@ void addrecord() {
 
         getchar();
 
-        printf("\nStudent record added successfully:\n");
-        printf("ID: %d\nName: %s\nDOB: %s\nGender: %s\nCourse: %s\nYear: %d\nGrades: %d\nCGPA: %.2f\nEmail: %s\nPhone: %d\nAddress: %s\n",
-               student.std_id, student.fullname, student.dob, student.gender, 
-               student.course, student.year, student.grades, student.cgpa, 
-               student.email, student.phonenum, student.address);
+
+        char query[512];
+        sprintf(query,
+                "INSERT INTO Students (std_id, fullname, dob, gender, course, year, grades, cgpa, email, phonenum, address) "
+                "VALUES (%d, '%s', '%s', '%s', '%s', %d, %d, %.2f, '%s', %lld, '%s')",
+                student.std_id, student.fullname, student.dob, student.gender, student.course,
+                student.year, student.grades, student.cgpa, student.email, student.phonenum, student.address);
+
+        if (mysql_query(conn, query)) {
+            fprintf(stderr, "Failed to insert record: %s\n", mysql_error(conn));
+        } else {
+            printf("\nStudent record added successfully!\n");
+        }
     } else {
         printf("Invalid gender entered. Please enter Male or Female.\n");
     }
 }
-int editrecord()
-{
-    
+
+int editrecord(MYSQL *conn) {
+    printf("Edit record functionality is under development.\n");
+    return 0;
 }
 
 int main() {
-    addrecord();
+    MYSQL *conn;
+
+  
+    conn = mysql_init(NULL);
+    if (conn == NULL) {
+        fprintf(stderr, "mysql_init() failed\n");
+        return EXIT_FAILURE;
+    }
+
+
+    if (mysql_real_connect(conn, HOST, USER, PASSWORD, DATABASE, 0, NULL, 0) == NULL) {
+        fprintf(stderr, "Connection failed: %s\n", mysql_error(conn));
+        mysql_close(conn);
+        return EXIT_FAILURE;
+    }
+
+
+    addrecord(conn);
+
+ 
+    mysql_close(conn);
     return 0;
 }
