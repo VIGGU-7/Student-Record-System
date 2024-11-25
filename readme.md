@@ -21,7 +21,7 @@ sudo apt-get install mysql-server libmysqlclient-dev gcc
 ```
 # Mysql Setup
 
-1.Create the **StudentDB** database and the **Students** table by running the following SQL commands:
+- Create the **StudentDB** database and the **Students** table by running the following SQL commands:
 ```bash
 CREATE DATABASE StudentDB;
 
@@ -41,15 +41,15 @@ CREATE TABLE Students (
     address VARCHAR(100)
 );
 ```
-2.don't forget to modify the connection parameters.
+- don't forget to modify the connection parameters.
 
 ----
 
 # compilation
 
-I've faced problems while compilation cuz mysql.h library wasn't installed i referred this https://dev.mysql.com/downloads/c-api/ and also i used chatgpt to fix the error as i am a new devoloper :p at last its succesfull :p;
+- I've faced problems while compilation cuz mysql.h library wasn't installed i referred this https://dev.mysql.com/downloads/c-api/ and also i used chatgpt to fix the error as i am a new devoloper :p at last its succesfull :p
 
-use the following command for compilation
+- use the following command for compilation
 ```bash
 gcc -o student_mgmt code.c -I/usr/include/mysql -lmysqlclient
 ```
