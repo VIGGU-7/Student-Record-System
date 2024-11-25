@@ -2,6 +2,12 @@
 #include <string.h>
 #include <mysql.h>
 
+#define HOST "localhost"
+#define USER "root"
+#define PASSWORD "root"
+#define DATABASE "StudentDB"
+#define MAX_QUERY_SIZE 1024
+
 struct student {
     int std_id;
     char fullname[100];
@@ -12,16 +18,9 @@ struct student {
     int grades;
     float cgpa;
     char email[100];
-    long long phonenum; 
+    long long phonenum;
     char address[100];
 };
-
-
-#define HOST "localhost"
-#define USER "root"      
-#define PASSWORD "root" 
-#define DATABASE "StudentDB"
-
 
 void addrecord(MYSQL *conn) {
     struct student student;
@@ -74,15 +73,14 @@ void addrecord(MYSQL *conn) {
         fgets(student.address, sizeof(student.address), stdin);
         student.address[strcspn(student.address, "\n")] = 0;
 
-        getchar();
+        char query[MAX_QUERY_SIZE];
 
-
-        char query[512];
-        sprintf(query,
-                "INSERT INTO Students (std_id, fullname, dob, gender, course, year, grades, cgpa, email, phonenum, address) "
-                "VALUES (%d, '%s', '%s', '%s', '%s', %d, %d, %.2f, '%s', %lld, '%s')",
-                student.std_id, student.fullname, student.dob, student.gender, student.course,
-                student.year, student.grades, student.cgpa, student.email, student.phonenum, student.address);
+        snprintf(query,
+                 sizeof(query),
+                 "INSERT INTO Students (std_id, fullname, dob, gender, course, year, grades, cgpa, email, phonenum, address) "
+                 "VALUES (%d, '%s', '%s', '%s', '%s', %d, %d, %.2f, '%s', %lld, '%s')",
+                 student.std_id, student.fullname, student.dob, student.gender, student.course,
+                 student.year, student.grades, student.cgpa, student.email, student.phonenum, student.address);
 
         if (mysql_query(conn, query)) {
             fprintf(stderr, "Failed to insert record: %s\n", mysql_error(conn));
@@ -102,13 +100,11 @@ int editrecord(MYSQL *conn) {
 int main() {
     MYSQL *conn;
 
-  
     conn = mysql_init(NULL);
     if (conn == NULL) {
         fprintf(stderr, "mysql_init() failed\n");
         return EXIT_FAILURE;
     }
-
 
     if (mysql_real_connect(conn, HOST, USER, PASSWORD, DATABASE, 0, NULL, 0) == NULL) {
         fprintf(stderr, "Connection failed: %s\n", mysql_error(conn));
@@ -116,10 +112,8 @@ int main() {
         return EXIT_FAILURE;
     }
 
-
     addrecord(conn);
 
- 
     mysql_close(conn);
     return 0;
 }
